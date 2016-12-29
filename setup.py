@@ -42,7 +42,6 @@ setup(
     keywords=('pytest spark pyspark unittest test'),
 
     install_requires=['pytest', 'findspark'],
-    packages=['pytest_spark'],
     entry_points={
         'pytest11': [
             'spark = pytest_spark',
