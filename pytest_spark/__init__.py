@@ -23,5 +23,6 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    spark_home = config.getini('spark_home') or None
+    spark_home = config.getini('spark_home')
+
     update_spark_home(spark_home)
