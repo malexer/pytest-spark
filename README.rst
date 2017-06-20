@@ -34,7 +34,7 @@ value to ``pytest.ini`` in your project directory::
 pytest-spark will try to import ``pyspark`` from specified location.
 
 
-Using fixture
+Using the ``spark_context`` fixture
 -------------
 
 Use fixture ``spark_context`` in your tests as a regular pyspark fixture.
@@ -48,6 +48,18 @@ Example::
         # ...
 
 
+Using the ``spark_session`` fixture
+-------------
+
+Use fixture ``spark_session`` in your tests as a regular pyspark fixture.
+A SparkSession instance with Hive support enabled will be created once and reused for the whole test
+session.
+
+Example::
+
+    def test_spark_session_dataframe(spark_session):
+        test_df = spark_session.createDataFrame([[1,3],[2,4]], "a: int, b: int")
+        # ...
 
 .. _pytest: http://pytest.org/
 .. _Apache Spark: https://spark.apache.org/
