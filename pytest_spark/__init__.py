@@ -47,3 +47,23 @@ def spark_context():
     yield sc
 
     sc.stop()
+
+
+@pytest.fixture(scope='session')
+def spark_session():
+    """Return a Hive enabled SparkSession instance with reduced logging
+    (session scope).
+    """
+
+    from pyspark.sql import SparkSession
+
+    spark_session = SparkSession.builder.enableHiveSupport().getOrCreate()
+    sc = spark_session.sparkContext
+
+    logger = sc._jvm.org.apache.log4j
+    logger.LogManager.getLogger("org").setLevel(logger.Level.OFF)
+    logger.LogManager.getLogger("akka").setLevel(logger.Level.OFF)
+
+    yield spark_session
+
+    spark_session.stop()
