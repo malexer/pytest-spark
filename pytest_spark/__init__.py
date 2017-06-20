@@ -44,4 +44,6 @@ def spark_context():
     logger.LogManager.getLogger("org").setLevel(logger.Level.OFF)
     logger.LogManager.getLogger("akka").setLevel(logger.Level.OFF)
 
-    return sc
+    yield sc
+
+    sc.stop()
