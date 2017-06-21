@@ -52,8 +52,16 @@ def spark_context():
 @pytest.fixture(scope='session')
 def spark_session():
     """Return a Hive enabled SparkSession instance with reduced logging
-    (session scope).
+    (session scope). Available from Spark 2.0 onwards.
     """
+    from pyspark import __version__ as spark_version
+
+    if not spark_version.startswith('2'):
+        raise Exception(
+            'The "spark_session" fixture is only available on spark 2.0 '
+            'and above. Please use the spark_context fixture and instanciate '
+            'a SQLContext or HiveContext from it in your tests.'
+        )
 
     from pyspark.sql import SparkSession
 
