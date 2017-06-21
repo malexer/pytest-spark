@@ -56,7 +56,7 @@ def spark_session():
     """
     from pyspark import __version__ as spark_version
 
-    if not spark_version.startswith('2'):
+    if spark_version.startswith('0') or spark_version.startswith('1'):
         raise Exception(
             'The "spark_session" fixture is only available on spark 2.0 '
             'and above. Please use the spark_context fixture and instanciate '
