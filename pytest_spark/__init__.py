@@ -44,4 +44,34 @@ def spark_context():
     logger.LogManager.getLogger("org").setLevel(logger.Level.OFF)
     logger.LogManager.getLogger("akka").setLevel(logger.Level.OFF)
 
-    return sc
+    yield sc
+
+    sc.stop()
+
+
+@pytest.fixture(scope='session')
+def spark_session():
+    """Return a Hive enabled SparkSession instance with reduced logging
+    (session scope). Available from Spark 2.0 onwards.
+    """
+    from pyspark import __version__ as spark_version
+
+    if spark_version.startswith('0') or spark_version.startswith('1'):
+        raise Exception(
+            'The "spark_session" fixture is only available on spark 2.0 '
+            'and above. Please use the spark_context fixture and instanciate '
+            'a SQLContext or HiveContext from it in your tests.'
+        )
+
+    from pyspark.sql import SparkSession
+
+    spark_session = SparkSession.builder.enableHiveSupport().getOrCreate()
+    sc = spark_session.sparkContext
+
+    logger = sc._jvm.org.apache.log4j
+    logger.LogManager.getLogger("org").setLevel(logger.Level.OFF)
+    logger.LogManager.getLogger("akka").setLevel(logger.Level.OFF)
+
+    yield spark_session
+
+    spark_session.stop()
