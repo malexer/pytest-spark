@@ -34,7 +34,7 @@ value to ``pytest.ini`` in your project directory::
 pytest-spark will try to import ``pyspark`` from specified location.
 
 
-Using the ``spark_context`` fixture (Spark 2.0 and above)
+Using the ``spark_context`` fixture
 -------------
 
 Use fixture ``spark_context`` in your tests as a regular pyspark fixture.
@@ -48,7 +48,7 @@ Example::
         # ...
 
 
-Using the ``spark_session`` fixture
+Using the ``spark_session`` fixture (Spark 2.0 and above)
 -------------
 
 Use fixture ``spark_session`` in your tests as a regular pyspark fixture.
