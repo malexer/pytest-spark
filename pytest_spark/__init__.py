@@ -52,8 +52,11 @@ def spark_context():
 @pytest.fixture(scope='session')
 def spark_session():
     """Return a Hive enabled SparkSession instance with reduced logging
-    (session scope). Available from Spark 2.0 onwards.
+    (session scope).
+
+    Available from Spark 2.0 onwards.
     """
+
     from pyspark import __version__ as spark_version
 
     if spark_version.startswith('0') or spark_version.startswith('1'):

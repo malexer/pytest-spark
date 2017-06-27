@@ -35,7 +35,7 @@ pytest-spark will try to import ``pyspark`` from specified location.
 
 
 Using the ``spark_context`` fixture
--------------
+-----------------------------------
 
 Use fixture ``spark_context`` in your tests as a regular pyspark fixture.
 SparkContext instance will be created once and reused for the whole test
@@ -49,7 +49,7 @@ Example::
 
 
 Using the ``spark_session`` fixture (Spark 2.0 and above)
--------------
+---------------------------------------------------------
 
 Use fixture ``spark_session`` in your tests as a regular pyspark fixture.
 A SparkSession instance with Hive support enabled will be created once and reused for the whole test
