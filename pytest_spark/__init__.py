@@ -57,16 +57,14 @@ def spark_session():
     Available from Spark 2.0 onwards.
     """
 
-    from pyspark import __version__ as spark_version
-
-    if spark_version.startswith('0') or spark_version.startswith('1'):
+    try:
+        from pyspark.sql import SparkSession
+    except ImportError:
         raise Exception(
             'The "spark_session" fixture is only available on spark 2.0 '
             'and above. Please use the spark_context fixture and instanciate '
             'a SQLContext or HiveContext from it in your tests.'
         )
-
-    from pyspark.sql import SparkSession
 
     spark_session = SparkSession.builder.enableHiveSupport().getOrCreate()
     sc = spark_session.sparkContext
