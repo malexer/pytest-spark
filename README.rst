@@ -31,14 +31,14 @@ value to ``pytest.ini`` in your project directory::
     [pytest]
     spark_home = /opt/spark
 
-Or set the "SPARK_HOME" environmental variable.
+Or set the "SPARK_HOME" environment variable.
 
 pytest-spark will try to import ``pyspark`` from specified location.
 
-Order of reading spark_home:
+Order of reading the "spark_home":
 
 1. pytest.ini
-2. "SPARK_HOME" environmental variable
+2. "SPARK_HOME" environment variable
 3. Try to find it in common locations (i.e. OS X Homebrew)
 
 
