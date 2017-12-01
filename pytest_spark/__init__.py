@@ -5,8 +5,12 @@ import pytest
 
 
 def find_spark_home_var(config):
-    spark_home = config.getini('spark_home')
-    source = 'config (pytest.ini)'
+    spark_home = config.option.spark_home
+    source = 'config (command line option "--spark_home")'
+
+    if not spark_home:
+        spark_home = config.getini('spark_home')
+        source = 'config (pytest.ini)'
 
     if not spark_home:
         spark_home = os.environ.get('SPARK_HOME')
@@ -50,6 +54,11 @@ def get_spark_version(spark_home):
 
 def pytest_addoption(parser):
     parser.addini('spark_home', 'Spark install directory (SPARK_HOME).')
+    parser.addoption(
+        '--spark_home',
+        dest='spark_home',
+        help='Spark install directory (SPARK_HOME).',
+    )
 
 
 def pytest_configure(config):

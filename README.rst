@@ -25,21 +25,26 @@ Usage
 Set Spark location
 ------------------
 
-To run tests with required spark_home location just add "spark_home"
-value to ``pytest.ini`` in your project directory::
+To run tests with required spark_home location you need to define it by
+using one of the following methods::
+
+1. Specify command line option "--spark_home"::
+
+    $ pytest --spark_home=/opt/spark
+
+3. Add "spark_home" value to ``pytest.ini`` in your project directory::
 
     [pytest]
     spark_home = /opt/spark
 
-Or set the "SPARK_HOME" environment variable.
+3. Set the "SPARK_HOME" environment variable.
 
-pytest-spark will try to import ``pyspark`` from specified location.
+pytest-spark will try to import ``pyspark`` from provided location.
 
-Order of reading the "spark_home":
 
-1. pytest.ini
-2. "SPARK_HOME" environment variable
-3. Try to find it in common locations (i.e. OS X Homebrew)
+.. note::
+    "spark_home" will be read in the specified order. i.e. you can
+    override ``pytest.ini`` value by command line option.
 
 
 Using the ``spark_context`` fixture
