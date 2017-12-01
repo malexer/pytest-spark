@@ -26,7 +26,7 @@ Set Spark location
 ------------------
 
 To run tests with required spark_home location you need to define it by
-using one of the following methods::
+using one of the following methods:
 
 1. Specify command line option "--spark_home"::
 
