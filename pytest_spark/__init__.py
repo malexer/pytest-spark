@@ -4,6 +4,22 @@ import findspark
 import pytest
 
 
+def find_spark_home_var(config):
+    spark_home = config.getini('spark_home')
+    source = 'config (pytest.ini)'
+
+    if not spark_home:
+        spark_home = os.environ.get('SPARK_HOME')
+        source = 'ENV'
+
+    if not spark_home:
+        raise ValueError(
+            '"SPARK_HOME" variable was not found neither in pytest.ini '
+            'nor as environmental variable.')
+
+    return spark_home, source
+
+
 def update_spark_home(spark_home, source):
     """Set SPARK_HOME with provided path and perform all required
     configuration to make pyspark importable.
@@ -23,20 +39,33 @@ def update_spark_home(spark_home, source):
     findspark.init(spark_home)
 
 
+def get_spark_version(spark_home):
+    if spark_home:
+        spark_home = os.path.abspath(spark_home)
+        release_info_filename = os.path.join(spark_home, 'RELEASE')
+        if os.path.exists(release_info_filename):
+            with open(release_info_filename) as release_info:
+                return release_info.read()
+
+
 def pytest_addoption(parser):
     parser.addini('spark_home', 'Spark install directory (SPARK_HOME).')
 
 
 def pytest_configure(config):
-    source = 'config (pytest.ini)'
-    spark_home = config.getini('spark_home')
-
-    if not spark_home:
-        source = 'ENV'
-        spark_home = os.environ.get('SPARK_HOME')
+    spark_home, source = find_spark_home_var(config)
 
     if spark_home:
         update_spark_home(spark_home, source)
+
+
+def pytest_report_header(config, startdir):
+    spark_home, _ = find_spark_home_var(config)
+    if spark_home:
+        spark_ver = get_spark_version(spark_home)
+        if spark_ver:
+            spark_ver = spark_ver.strip().replace('\n', ' | ')
+            return "spark version -- " + spark_ver
 
 
 @pytest.fixture(scope='session')
