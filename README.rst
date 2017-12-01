@@ -32,7 +32,7 @@ using one of the following methods::
 
     $ pytest --spark_home=/opt/spark
 
-3. Add "spark_home" value to ``pytest.ini`` in your project directory::
+2. Add "spark_home" value to ``pytest.ini`` in your project directory::
 
     [pytest]
     spark_home = /opt/spark
