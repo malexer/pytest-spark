@@ -4,52 +4,47 @@ import findspark
 import pytest
 
 
-def find_spark_home_var(config):
-    spark_home = config.option.spark_home
-    source = 'config (command line option "--spark_home")'
+class SparkHome(object):
 
-    if not spark_home:
-        spark_home = config.getini('spark_home')
-        source = 'config (pytest.ini)'
+    def __init__(self, pytest_config):
+        self.config = pytest_config
 
-    if not spark_home:
-        spark_home = os.environ.get('SPARK_HOME')
-        source = 'ENV'
+        self._path, source_name = self._detect_path()
+        if self._path:
+            self._path = os.path.abspath(self._path)
+            if not os.path.exists(self._path):
+                raise OSError(
+                    "SPARK_HOME path specified in %s does not exist: %s"
+                    % (source_name, self._path))
 
-    if not spark_home:
-        raise ValueError(
-            '"SPARK_HOME" variable was not found neither in pytest.ini '
-            'nor as environmental variable.')
+    @property
+    def path(self):
+        return self._path
 
-    return spark_home, source
+    @property
+    def version(self):
+        if self.path:
+            return self._get_spark_version(self.path)
 
-
-def update_spark_home(spark_home, source):
-    """Set SPARK_HOME with provided path and perform all required
-    configuration to make pyspark importable.
-
-    :param spark_home: path to Apache Spark
-    :param source: name of the source, used for error message in case if
-                   specified path was not found
-    """
-
-    if spark_home is not None:
-        spark_home = os.path.abspath(spark_home)
-        if not os.path.exists(spark_home):
-            raise OSError(
-                "SPARK_HOME path specified in %s does not exist: %s"
-                % (source, spark_home))
-
-    findspark.init(spark_home)
-
-
-def get_spark_version(spark_home):
-    if spark_home:
-        spark_home = os.path.abspath(spark_home)
+    def _get_spark_version(self, spark_home):
         release_info_filename = os.path.join(spark_home, 'RELEASE')
         if os.path.exists(release_info_filename):
             with open(release_info_filename) as release_info:
                 return release_info.read()
+
+    def _locations(self):
+        yield (
+            self.config.option.spark_home,
+            'config (command line option "--spark_home")',
+        )
+        yield (self.config.getini('spark_home'), 'config (pytest.ini)')
+        yield (os.environ.get('SPARK_HOME'), 'ENV')
+
+    def _detect_path(self):
+        for path, description in self._locations():
+            if path:
+                return path, description
+        return None, None
 
 
 def pytest_addoption(parser):
@@ -62,19 +57,17 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    spark_home, source = find_spark_home_var(config)
+    spark_home = SparkHome(config).path
 
     if spark_home:
-        update_spark_home(spark_home, source)
+        findspark.init(spark_home)
 
 
 def pytest_report_header(config, startdir):
-    spark_home, _ = find_spark_home_var(config)
-    if spark_home:
-        spark_ver = get_spark_version(spark_home)
-        if spark_ver:
-            spark_ver = spark_ver.strip().replace('\n', ' | ')
-            return "spark version -- " + spark_ver
+    spark_ver = SparkHome(config).version
+    if spark_ver:
+        spark_ver = spark_ver.strip().replace('\n', ' | ')
+        return "spark version -- " + spark_ver
 
 
 @pytest.fixture(scope='session')
