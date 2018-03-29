@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmalexer%2Fpytest-spark.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmalexer%2Fpytest-spark?ref=badge_shield)
+
 pytest-spark
 ############
 
@@ -76,3 +78,7 @@ Example::
 
 .. _pytest: http://pytest.org/
 .. _Apache Spark: https://spark.apache.org/
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmalexer%2Fpytest-spark.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmalexer%2Fpytest-spark?ref=badge_large)
