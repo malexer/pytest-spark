@@ -70,49 +70,75 @@ def pytest_report_header(config, startdir):
         return "spark version -- " + spark_ver
 
 
-@pytest.fixture(scope='session')
-def spark_context():
-    """Return a SparkContext instance with reduced logging
-    (session scope).
-    """
-
-    from pyspark import SparkContext
-
-    sc = SparkContext()
+def reduce_logging(sc):
+    """Reduce logging in SparkContext instance."""
 
     logger = sc._jvm.org.apache.log4j
     logger.LogManager.getLogger("org").setLevel(logger.Level.OFF)
     logger.LogManager.getLogger("akka").setLevel(logger.Level.OFF)
 
-    yield sc
 
-    sc.stop()
+@pytest.fixture(scope='session')
+def _spark_session():
+    """Internal fixture for SparkSession instance.
+
+    Yields SparkSession instance if it is supported by the pyspark
+    version, otherwise yields None.
+
+    Required to correctly initialize `spark_context` fixture after
+    `spark_session` fixture.
+
+    ..note::
+        It is not possible to create SparkSession from the existing
+        SparkContext.
+    """
+
+    try:
+        from pyspark.sql import SparkSession
+    except ImportError:
+        yield
+    else:
+        session = SparkSession.builder.enableHiveSupport().getOrCreate()
+        yield session
+        session.stop()
 
 
 @pytest.fixture(scope='session')
-def spark_session():
+def spark_context(_spark_session):
+    """Return a SparkContext instance with reduced logging
+    (session scope).
+    """
+
+    if _spark_session is None:
+        from pyspark import SparkContext
+
+        # pyspark 1.x: create SparkContext instance
+        sc = SparkContext()
+    else:
+        # pyspark 2.x: get SparkContext from SparkSession fixture
+        sc = _spark_session.sparkContext
+
+    reduce_logging(sc)
+    yield sc
+
+    if _spark_session is None:
+        sc.stop()  # pyspark 1.x: stop SparkContext instance
+
+
+@pytest.fixture(scope='session')
+def spark_session(_spark_session):
     """Return a Hive enabled SparkSession instance with reduced logging
     (session scope).
 
     Available from Spark 2.0 onwards.
     """
 
-    try:
-        from pyspark.sql import SparkSession
-    except ImportError:
+    if _spark_session is None:
         raise Exception(
             'The "spark_session" fixture is only available on spark 2.0 '
             'and above. Please use the spark_context fixture and instanciate '
             'a SQLContext or HiveContext from it in your tests.'
         )
-
-    spark_session = SparkSession.builder.enableHiveSupport().getOrCreate()
-    sc = spark_session.sparkContext
-
-    logger = sc._jvm.org.apache.log4j
-    logger.LogManager.getLogger("org").setLevel(logger.Level.OFF)
-    logger.LogManager.getLogger("akka").setLevel(logger.Level.OFF)
-
-    yield spark_session
-
-    spark_session.stop()
+    else:
+        reduce_logging(_spark_session.sparkContext)
+        yield _spark_session
