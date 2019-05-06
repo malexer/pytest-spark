@@ -18,4 +18,7 @@ before_install:
   - rm /opt/spark.tgz
   - ln -s $(find /opt -maxdepth 1 -name "spark-*" -print0) /opt/spark
 
+install:
+  - python setup.py install
+
 script: pytest
