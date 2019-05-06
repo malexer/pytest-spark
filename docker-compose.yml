@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+
+    tests:
+        build:
+            context: .
+            dockerfile: test_env/tox.Dockerfile
+        image: pytest_spark/tests
+        container_name: pytest-spark-tests
