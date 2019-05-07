@@ -1,5 +1,8 @@
 FROM openjdk:8-jdk-alpine
 
+WORKDIR /tests/
+
+# install packages and Spark download script
 COPY ./test_env/download_spark.sh /
 RUN apk --no-cache add bash curl wget py-pip python3 \
     && chmod +x /download_spark.sh
@@ -14,9 +17,8 @@ RUN export APACHE_MIRROR=$(curl -s 'https://www.apache.org/dyn/closer.cgi?as_jso
     && export SPARK24_FULL_URL="${APACHE_MIRROR}${SPARK24_URL}" \
     && /download_spark.sh $SPARK24_FULL_URL /opt/spark24
 
-COPY ./ /tests/
-
-WORKDIR /tests/
+# prepare to run tests
 RUN pip install --no-cache-dir tox
+COPY ./ /tests/
 
 CMD [ "tox" ]

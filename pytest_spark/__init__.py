@@ -78,6 +78,20 @@ def reduce_logging(sc):
     logger.LogManager.getLogger("akka").setLevel(logger.Level.OFF)
 
 
+def get_spark_config():
+    from pyspark import SparkConf
+
+    return SparkConf() \
+        .set('spark.default.parallelism', 1) \
+        .set('spark.dynamicAllocation.enabled', 'false') \
+        .set('spark.executor.cores', 1) \
+        .set('spark.executor.instances', 1) \
+        .set('spark.io.compression.codec', 'lz4') \
+        .set('spark.rdd.compress', 'false') \
+        .set('spark.sql.shuffle.partitions', 1) \
+        .set('spark.shuffle.compress', 'false')
+
+
 @pytest.fixture(scope='session')
 def _spark_session():
     """Internal fixture for SparkSession instance.
@@ -98,7 +112,11 @@ def _spark_session():
     except ImportError:
         yield
     else:
-        session = SparkSession.builder.enableHiveSupport().getOrCreate()
+        session = SparkSession.builder \
+            .config(conf=get_spark_config()) \
+            .enableHiveSupport() \
+            .getOrCreate()
+
         yield session
         session.stop()
 
@@ -113,7 +131,7 @@ def spark_context(_spark_session):
         from pyspark import SparkContext
 
         # pyspark 1.x: create SparkContext instance
-        sc = SparkContext()
+        sc = SparkContext(conf=get_spark_config())
     else:
         # pyspark 2.x: get SparkContext from SparkSession fixture
         sc = _spark_session.sparkContext
