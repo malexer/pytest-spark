@@ -47,13 +47,70 @@ class SparkHome(object):
         return None, None
 
 
+class SparkConfigBuilder(object):
+
+    DEFAULTS = {
+        'spark.app.name': 'pytest-spark',
+        'spark.default.parallelism': 1,
+        'spark.dynamicAllocation.enabled': 'false',
+        'spark.executor.cores': 1,
+        'spark.executor.instances': 1,
+        'spark.io.compression.codec': 'lz4',
+        'spark.rdd.compress': 'false',
+        'spark.sql.shuffle.partitions': 1,
+        'spark.shuffle.compress': 'false',
+    }
+
+    options = None
+    _instance = None
+
+    @classmethod
+    def _parse_config(cls, values):
+
+        def parse_value_string(value_str):
+            split_char = ':' if ':' in value_str else '='
+            k, v = [s.strip() for s in value_str.split(split_char, 1)]
+            return (k, v)
+
+        return dict([parse_value_string(val) for val in values])
+
+    @classmethod
+    def initialize(cls, options_from_ini=None):
+        if cls._instance:
+            return cls._instance
+
+        from pyspark import SparkConf
+
+        cls._instance = SparkConf()
+
+        cls.options = dict(cls.DEFAULTS)
+        if options_from_ini:
+            cls.options.update(cls._parse_config(options_from_ini))
+
+        for k, v in cls.options.items():
+            cls._instance.set(k, v)
+
+        return cls._instance
+
+    @classmethod
+    def get(cls):
+        if not cls._instance:
+            raise ValueError
+            cls.initialize()
+
+        return cls._instance
+
+
 def pytest_addoption(parser):
-    parser.addini('spark_home', 'Spark install directory (SPARK_HOME).')
+    parser.addini('spark_home', help='Spark install directory (SPARK_HOME).')
     parser.addoption(
         '--spark_home',
         dest='spark_home',
         help='Spark install directory (SPARK_HOME).',
     )
+
+    parser.addini(
+        'spark_options', help='Additional options for Spark.', type='linelist')
 
 
 def pytest_configure(config):
@@ -62,12 +119,25 @@ def pytest_configure(config):
     if spark_home:
         findspark.init(spark_home)
 
+    spark_options = config.getini('spark_options')
+    if spark_options:
+        SparkConfigBuilder().initialize(options_from_ini=spark_options)
+
 
 def pytest_report_header(config, startdir):
+    header_lines = []
     spark_ver = SparkHome(config).version
     if spark_ver:
         spark_ver = spark_ver.strip().replace('\n', ' | ')
-        return "spark version -- " + spark_ver
+        header_lines.append('spark version -- ' + spark_ver)
+
+    spark_options = SparkConfigBuilder().options
+    if spark_options:
+        header_lines.append('Spark will be initialized with options:')
+        for k in sorted(spark_options.keys()):
+            header_lines.append('  %s: %s' % (k, spark_options[k]))
+
+    return '\n'.join(header_lines)
 
 
 def reduce_logging(sc):
@@ -79,17 +149,7 @@ def reduce_logging(sc):
 
 
 def get_spark_config():
-    from pyspark import SparkConf
-
-    return SparkConf() \
-        .set('spark.default.parallelism', 1) \
-        .set('spark.dynamicAllocation.enabled', 'false') \
-        .set('spark.executor.cores', 1) \
-        .set('spark.executor.instances', 1) \
-        .set('spark.io.compression.codec', 'lz4') \
-        .set('spark.rdd.compress', 'false') \
-        .set('spark.sql.shuffle.partitions', 1) \
-        .set('spark.shuffle.compress', 'false')
+    return SparkConfigBuilder().get()
 
 
 @pytest.fixture(scope='session')
