@@ -7,8 +7,12 @@ This plugin will allow to specify SPARK_HOME directory in ``pytest.ini``
 and thus to make "pyspark" importable in your tests which are executed
 by pytest.
 
-Also it defines session scope fixture ``spark_context`` which can be
-used in your tests.
+You can also define "spark_options" in ``pytest.ini`` to customize pyspark,
+including "spark.jars.packages" option which allows to load external
+libraries (e.g. "com.databricks:spark-xml").
+
+pytest-spark provides session scope fixtures ``spark_context`` and
+``spark_session`` which can be used in your tests.
 
 
 Install
@@ -45,6 +49,19 @@ pytest-spark will try to import ``pyspark`` from provided location.
 .. note::
     "spark_home" will be read in the specified order. i.e. you can
     override ``pytest.ini`` value by command line option.
+
+
+Customize spark_options
+-----------------------
+
+Just define "spark_options" in your ``pytest.ini``, e.g.:
+
+    [pytest]
+    spark_home = /opt/spark
+    spark_options =
+        spark.app.name: my-pytest-spark-tests
+        spark.executor.instances: 1
+        spark.jars.packages: com.databricks:spark-xml_2.12:0.5.0
 
 
 Using the ``spark_context`` fixture
