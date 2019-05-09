@@ -54,7 +54,7 @@ pytest-spark will try to import ``pyspark`` from provided location.
 Customize spark_options
 -----------------------
 
-Just define "spark_options" in your ``pytest.ini``, e.g.:
+Just define "spark_options" in your ``pytest.ini``, e.g.::
 
     [pytest]
     spark_home = /opt/spark
