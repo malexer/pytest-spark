@@ -8,5 +8,3 @@ services:
             dockerfile: test_env/tox.Dockerfile
         image: pytest_spark/tests
         container_name: pytest-spark-tests
-        volumes:
-            - ./:/tests/

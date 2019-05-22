@@ -1,12 +1,14 @@
 #!/bin/sh
 
+set -x
+set -e
+
 SPARK_URL=$1
 TARGET_DIR=$2
 
-set -e
 
 mkdir -p /opt
-wget -q -O /opt/spark.tgz "$SPARK_URL"
+wget -nv -O /opt/spark.tgz "$SPARK_URL"
 tar xzf /opt/spark.tgz -C /opt/
 rm /opt/spark.tgz
 
