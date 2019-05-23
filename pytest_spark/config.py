@@ -46,7 +46,8 @@ class SparkConfigBuilder(object):
     @classmethod
     def get(cls):
         if not cls._instance:
-            raise ValueError
-            cls.initialize()
+            raise RuntimeError(
+                "pytest-spark configuration was not correctly loaded"
+            )
 
         return cls._instance

@@ -29,9 +29,8 @@ def pytest_configure(config):
     if spark_home:
         findspark.init(spark_home)
 
-    spark_options = config.getini('spark_options')
-    if spark_options:
-        SparkConfigBuilder().initialize(options_from_ini=spark_options)
+    spark_options = config.getini('spark_options') or None
+    SparkConfigBuilder().initialize(options_from_ini=spark_options)
 
 
 def pytest_report_header(config, startdir):
