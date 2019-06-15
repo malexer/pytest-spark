@@ -46,7 +46,6 @@ class SparkConfigBuilder(object):
     @classmethod
     def get(cls):
         if not cls._instance:
-            raise ValueError
             cls.initialize()
 
         return cls._instance
