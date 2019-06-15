@@ -2,10 +2,12 @@ FROM openjdk:8-jdk-alpine
 
 WORKDIR /tests/
 
-# install packages and Spark download script
+# install packages
+RUN apk --no-cache add bash curl wget py-pip python3
+
+# install Spark download script
 COPY ./test_env/download_spark.sh /
-RUN apk --no-cache add bash curl wget py-pip python3 \
-    && chmod +x /download_spark.sh
+RUN chmod +x /download_spark.sh
 
 # install Spark 1.6
 ENV SPARK16_URL https://archive.apache.org/dist/spark/spark-1.6.3/spark-1.6.3-bin-hadoop2.6.tgz
@@ -19,6 +21,6 @@ RUN export APACHE_MIRROR=$(curl -s 'https://www.apache.org/dyn/closer.cgi?as_jso
 
 # prepare to run tests
 RUN pip install --no-cache-dir tox
-COPY ./ /tests/
+COPY ./ ./test_env/tox.ini /tests/
 
 CMD [ "tox" ]
