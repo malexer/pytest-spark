@@ -17,6 +17,7 @@ before_install:
   - tar xzf /opt/spark.tgz -C /opt/
   - rm /opt/spark.tgz
   - ln -s $(find /opt -maxdepth 1 -name "spark-*" -print0) /opt/spark
+  - pip install --upgrade pytest
 
 install:
   - python setup.py install
