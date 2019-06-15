@@ -1,6 +1,9 @@
 pytest-spark
 ############
 
+.. image:: https://travis-ci.org/malexer/pytest-spark.svg?branch=master
+    :target: https://travis-ci.org/malexer/pytest-spark
+
 pytest_ plugin to run the tests with support of pyspark (`Apache Spark`_).
 
 This plugin will allow to specify SPARK_HOME directory in ``pytest.ini``
@@ -90,6 +93,18 @@ Example::
     def test_spark_session_dataframe(spark_session):
         test_df = spark_session.createDataFrame([[1,3],[2,4]], "a: int, b: int")
         # ...
+
+
+Development
+===========
+
+Tests
+-----
+
+Run tests locally::
+
+    $ docker-compose up --build
+
 
 .. _pytest: http://pytest.org/
 .. _Apache Spark: https://spark.apache.org/
