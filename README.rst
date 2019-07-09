@@ -17,6 +17,11 @@ libraries (e.g. "com.databricks:spark-xml").
 pytest-spark provides session scope fixtures ``spark_context`` and
 ``spark_session`` which can be used in your tests.
 
+**Note:** no need to define SPARK_HOME if you've installed pyspark using
+pip (e.g. `pip install pyspark`) - it should be already importable. In
+this case just don't define SPARK_HOME neither in pytest
+(pytest.ini / --spark_home) nor as environment variable.
+
 
 Install
 =======
