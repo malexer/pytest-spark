@@ -99,6 +99,33 @@ Example::
         test_df = spark_session.createDataFrame([[1,3],[2,4]], "a: int, b: int")
         # ...
 
+Overriding default parameters of the ``spark_session`` fixture
+---------------------------------------------------------
+By default ``spark_session`` will be loaded with the following configurations : 
+
+Example::
+
+    {
+        'spark.app.name': 'pytest-spark',
+        'spark.default.parallelism': 1,
+        'spark.dynamicAllocation.enabled': 'false',
+        'spark.executor.cores': 1,
+        'spark.executor.instances': 1,
+        'spark.io.compression.codec': 'lz4',
+        'spark.rdd.compress': 'false',
+        'spark.sql.shuffle.partitions': 1,
+        'spark.shuffle.compress': 'false',
+        'spark.sql.catalogImplementation': 'hive',
+    }
+
+You can override some of these parameters in your ``pytest.ini``. 
+For example, removing Hive Support for the spark session : 
+
+Example::
+    [pytest]
+    spark_home = /opt/spark
+    spark_options =
+        spark.sql.catalogImplementation: in-memory
 
 Development
 ===========
