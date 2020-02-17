@@ -100,7 +100,7 @@ Example::
         # ...
 
 Overriding default parameters of the ``spark_session`` fixture
----------------------------------------------------------
+--------------------------------------------------------------
 By default ``spark_session`` will be loaded with the following configurations : 
 
 Example::
@@ -122,6 +122,7 @@ You can override some of these parameters in your ``pytest.ini``.
 For example, removing Hive Support for the spark session : 
 
 Example::
+
     [pytest]
     spark_home = /opt/spark
     spark_options =
