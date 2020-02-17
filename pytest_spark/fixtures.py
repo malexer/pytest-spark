@@ -26,7 +26,6 @@ def _spark_session():
     else:
         session = SparkSession.builder \
             .config(conf=SparkConfigBuilder().get()) \
-            .enableHiveSupport() \
             .getOrCreate()
 
         yield session
