@@ -10,6 +10,7 @@ class SparkConfigBuilder(object):
         'spark.rdd.compress': 'false',
         'spark.sql.shuffle.partitions': 1,
         'spark.shuffle.compress': 'false',
+        'spark.sql.catalogImplementation': 'hive',
     }
 
     options = None
