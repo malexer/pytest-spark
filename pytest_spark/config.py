@@ -1,3 +1,6 @@
+import os
+
+
 class SparkConfigBuilder(object):
 
     DEFAULTS = {
@@ -13,8 +16,26 @@ class SparkConfigBuilder(object):
         'spark.sql.catalogImplementation': 'hive',
     }
 
+    SPARK_REMOTE_DISABLED_SETTINGS = {
+        'spark.sql.catalogImplementation',
+        'spark.executor.cores',
+        'spark.executor.instances',
+        'spark.rdd.compress',
+        'spark.sql.extensions',
+        'spark.sql.catalog.spark_catalog',
+        'spark.jars.packages',
+        # '',
+        # '',
+        # '',
+        # '',
+        # '',
+        # '',
+        # '',
+    }
+
     options = None
     _instance = None
+    spark_connect = False
 
     @classmethod
     def _parse_config(cls, values):
@@ -28,6 +49,7 @@ class SparkConfigBuilder(object):
 
     @classmethod
     def initialize(cls, options_from_ini=None):
+
         if cls._instance:
             return cls._instance
 
@@ -37,7 +59,13 @@ class SparkConfigBuilder(object):
 
         cls.options = dict(cls.DEFAULTS)
         if options_from_ini:
-            cls.options.update(cls._parse_config(options_from_ini))
+            opts = cls._parse_config(options_from_ini)
+            cls.options.update(opts)
+        if os.environ.get("SPARK_REMOTE"):
+            cls.spark_connect = True
+            for k in cls.SPARK_REMOTE_DISABLED_SETTINGS:
+                if k in cls.options:
+                    del cls.options[k]
 
         for k, v in cls.options.items():
             cls._instance.set(k, v)
@@ -50,3 +78,7 @@ class SparkConfigBuilder(object):
             cls.initialize()
 
         return cls._instance
+
+    @classmethod
+    def is_spark_connect(cls):
+        return cls.spark_connect

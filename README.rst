@@ -6,7 +6,7 @@ pytest-spark
 
 pytest_ plugin to run the tests with support of pyspark (`Apache Spark`_).
 
-This plugin will allow to specify SPARK_HOME directory in ``pytest.ini``
+This plugin will allow to specify ``SPARK_HOME`` directory in ``pytest.ini``
 and thus to make "pyspark" importable in your tests which are executed
 by pytest.
 
@@ -17,10 +17,10 @@ libraries (e.g. "com.databricks:spark-xml").
 pytest-spark provides session scope fixtures ``spark_context`` and
 ``spark_session`` which can be used in your tests.
 
-**Note:** no need to define SPARK_HOME if you've installed pyspark using
+**Note:** no need to define ``SPARK_HOME`` if you've installed pyspark using
 pip (e.g. ``pip install pyspark``) - it should be already importable. In
-this case just don't define SPARK_HOME neither in pytest
-(pytest.ini / --spark_home) nor as environment variable.
+this case just don't define ``SPARK_HOME`` neither in pytest
+(``pytest.ini`` / ``--spark_home``) nor as environment variable.
 
 
 Install
@@ -86,6 +86,8 @@ Example::
         # ...
 
 
+Warning: ``spark_context`` isn't supported with Spark Connect functionality!
+        
 Using the ``spark_session`` fixture (Spark 2.0 and above)
 ---------------------------------------------------------
 
@@ -127,6 +129,15 @@ Example::
     spark_home = /opt/spark
     spark_options =
         spark.sql.catalogImplementation: in-memory
+
+Using ``spark_session`` fixture with Spark Connect
+--------------------------------------------------
+
+pytest-spark also works with Spark Connect that allows to execute code on the remote
+servers.  It's automatically enabled when the ``SPARK_REMOTE`` environment variable is
+set.  Please note that in this mode, some of the Spark configurations will be ignored,
+such as, ``spark.executor.cores``, ``spark.executor.instances``, etc. that doesn't have an
+effect on the existing Spark Session.
 
 Development
 ===========

@@ -38,6 +38,9 @@ def spark_context(_spark_session):
     (session scope).
     """
 
+    if SparkConfigBuilder.is_spark_connect():
+        raise NotImplemented("Spark Connect doesn't support RDD API!")
+
     if _spark_session is None:
         from pyspark import SparkContext
 
@@ -69,5 +72,6 @@ def spark_session(_spark_session):
             'a SQLContext or HiveContext from it in your tests.'
         )
     else:
-        reduce_logging(_spark_session.sparkContext)
+        if not SparkConfigBuilder.is_spark_connect():
+            reduce_logging(_spark_session.sparkContext)
         yield _spark_session
