@@ -81,4 +81,6 @@ class SparkConfigBuilder(object):
 
     @classmethod
     def is_spark_connect(cls):
+        if not cls._instance:
+            cls.initialize()
         return cls.spark_connect
