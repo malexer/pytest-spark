@@ -34,7 +34,7 @@ def pytest_configure(config):
         SparkConfigBuilder().initialize(options_from_ini=spark_options)
 
 
-def pytest_report_header(config, startdir):
+def pytest_report_header(config, *args):
     header_lines = []
     spark_ver = SparkHome(config).version
     if spark_ver:
