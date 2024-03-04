@@ -11,7 +11,7 @@ with open(path.join(cwd, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='pytest-spark',
-    version='0.6.0',
+    version='0.6.1',
 
     description='pytest plugin to run the tests with support of pyspark.',
     long_description=long_description,
@@ -41,7 +41,7 @@ setup(
 
     keywords=('pytest spark pyspark unittest test'),
 
-    install_requires=['pytest', 'findspark'],
+    install_requires=['pytest>=7', 'findspark'],
     packages=['pytest_spark'],
     entry_points={
         'pytest11': [
