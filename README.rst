@@ -1,9 +1,6 @@
 pytest-spark
 ############
 
-.. image:: https://travis-ci.org/malexer/pytest-spark.svg?branch=master
-    :target: https://travis-ci.org/malexer/pytest-spark
-
 pytest_ plugin to run the tests with support of pyspark (`Apache Spark`_).
 
 This plugin will allow to specify SPARK_HOME directory in ``pytest.ini``
@@ -101,7 +98,7 @@ Example::
 
 Overriding default parameters of the ``spark_session`` fixture
 --------------------------------------------------------------
-By default ``spark_session`` will be loaded with the following configurations : 
+By default ``spark_session`` will be loaded with the following configurations :
 
 Example::
 
@@ -118,8 +115,8 @@ Example::
         'spark.sql.catalogImplementation': 'hive',
     }
 
-You can override some of these parameters in your ``pytest.ini``. 
-For example, removing Hive Support for the spark session : 
+You can override some of these parameters in your ``pytest.ini``.
+For example, removing Hive Support for the spark session :
 
 Example::
 
