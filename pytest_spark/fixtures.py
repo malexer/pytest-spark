@@ -24,9 +24,11 @@ def _spark_session():
     except ImportError:
         yield
     else:
-        session = SparkSession.builder \
-            .config(conf=SparkConfigBuilder().get()) \
-            .getOrCreate()
+        builder = SparkSession.builder \
+            .config(conf=SparkConfigBuilder().get())
+        if SparkConfigBuilder.is_spark_connect():
+            builder = builder.remote(SparkConfigBuilder.spark_connect_url)
+        session = builder.getOrCreate()
 
         yield session
         session.stop()

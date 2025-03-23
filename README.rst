@@ -131,10 +131,19 @@ Using ``spark_session`` fixture with Spark Connect
 --------------------------------------------------
 
 pytest-spark also works with Spark Connect that allows to execute code on the remote
-servers.  It's automatically enabled when the ``SPARK_REMOTE`` environment variable is
-set.  Please note that in this mode, some of the Spark configurations will be ignored,
-such as, ``spark.executor.cores``, ``spark.executor.instances``, etc. that doesn't have an
-effect on the existing Spark Session.
+servers. You need Spark 3.4+ with ``pyspark`` installed with the ``connect`` extension
+(``pyspark[connect]`` for PySpark 3.4+), or install ``pyspark-connect`` package (for
+PySpark 4.x).
+
+It could be enabled with one of the following options:
+
+* by setting ``SPARK_REMOTE`` environment variable to the URL of Spark Connect server.
+* specifying URL of Spark Connect server as ``spark_connect_url`` option in ``pytest.ini``.
+* with ``--spark_connect_url`` command-line argument.
+  
+**Note:** in this mode, some of the Spark configurations will be ignored, such as,
+``spark.executor.cores``, ``spark.executor.instances``, etc. that doesn't have an effect
+on the existing Spark Session.
 
 Development
 ===========

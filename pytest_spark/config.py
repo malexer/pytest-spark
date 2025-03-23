@@ -24,9 +24,9 @@ class SparkConfigBuilder(object):
         'spark.sql.extensions',
         'spark.sql.catalog.spark_catalog',
         'spark.jars.packages',
-        # '',
-        # '',
-        # '',
+        'spark.shuffle.compress',
+        'spark.io.compression.codec',
+        'spark.dynamicAllocation.enabled',
         # '',
         # '',
         # '',
@@ -35,7 +35,7 @@ class SparkConfigBuilder(object):
 
     options = None
     _instance = None
-    spark_connect = False
+    spark_connect_url = None
 
     @classmethod
     def _parse_config(cls, values):
@@ -48,7 +48,7 @@ class SparkConfigBuilder(object):
         return dict([parse_value_string(val) for val in values])
 
     @classmethod
-    def initialize(cls, options_from_ini=None):
+    def initialize(cls, options_from_ini=None, spark_connect_url=None):
 
         if cls._instance:
             return cls._instance
@@ -61,8 +61,8 @@ class SparkConfigBuilder(object):
         if options_from_ini:
             opts = cls._parse_config(options_from_ini)
             cls.options.update(opts)
-        if os.environ.get("SPARK_REMOTE"):
-            cls.spark_connect = True
+        if spark_connect_url or os.environ.get("SPARK_REMOTE"):
+            cls.spark_connect_url = spark_connect_url or os.environ.get("SPARK_REMOTE")
             for k in cls.SPARK_REMOTE_DISABLED_SETTINGS:
                 if k in cls.options:
                     del cls.options[k]
@@ -83,4 +83,4 @@ class SparkConfigBuilder(object):
     def is_spark_connect(cls):
         if not cls._instance:
             cls.initialize()
-        return cls.spark_connect
+        return bool(cls.spark_connect_url)
