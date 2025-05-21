@@ -24,9 +24,11 @@ def _spark_session():
     except ImportError:
         yield
     else:
-        session = SparkSession.builder \
-            .config(conf=SparkConfigBuilder().get()) \
-            .getOrCreate()
+        builder = SparkSession.builder \
+            .config(conf=SparkConfigBuilder().get())
+        if SparkConfigBuilder.is_spark_connect():
+            builder = builder.remote(SparkConfigBuilder.spark_connect_url)
+        session = builder.getOrCreate()
 
         yield session
         session.stop()
@@ -37,6 +39,9 @@ def spark_context(_spark_session):
     """Return a SparkContext instance with reduced logging
     (session scope).
     """
+
+    if SparkConfigBuilder.is_spark_connect():
+        raise NotImplemented("Spark Connect doesn't support RDD API!")
 
     if _spark_session is None:
         from pyspark import SparkContext
@@ -69,5 +74,6 @@ def spark_session(_spark_session):
             'a SQLContext or HiveContext from it in your tests.'
         )
     else:
-        reduce_logging(_spark_session.sparkContext)
+        if not SparkConfigBuilder.is_spark_connect():
+            reduce_logging(_spark_session.sparkContext)
         yield _spark_session

@@ -23,7 +23,8 @@ class SparkHome(object):
         if self.path:
             return self._get_spark_version(self.path)
 
-    def _get_spark_version(self, spark_home):
+    @staticmethod
+    def _get_spark_version(spark_home):
         release_info_filename = os.path.join(spark_home, 'RELEASE')
         if os.path.exists(release_info_filename):
             with open(release_info_filename) as release_info:
@@ -34,8 +35,8 @@ class SparkHome(object):
             self.config.option.spark_home,
             'config (command line option "--spark_home")',
         )
-        yield (self.config.getini('spark_home'), 'config (pytest.ini)')
-        yield (os.environ.get('SPARK_HOME'), 'ENV')
+        yield self.config.getini('spark_home'), 'config (pytest.ini)'
+        yield os.environ.get('SPARK_HOME'), 'ENV'
 
     def _detect_path(self):
         for path, description in self._locations():

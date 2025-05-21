@@ -1,3 +1,6 @@
+import os
+
+
 class SparkConfigBuilder(object):
 
     DEFAULTS = {
@@ -13,8 +16,26 @@ class SparkConfigBuilder(object):
         'spark.sql.catalogImplementation': 'hive',
     }
 
+    SPARK_REMOTE_DISABLED_SETTINGS = {
+        'spark.sql.catalogImplementation',
+        'spark.executor.cores',
+        'spark.executor.instances',
+        'spark.rdd.compress',
+        'spark.sql.extensions',
+        'spark.sql.catalog.spark_catalog',
+        'spark.jars.packages',
+        'spark.shuffle.compress',
+        'spark.io.compression.codec',
+        'spark.dynamicAllocation.enabled',
+        # '',
+        # '',
+        # '',
+        # '',
+    }
+
     options = None
     _instance = None
+    spark_connect_url = None
 
     @classmethod
     def _parse_config(cls, values):
@@ -27,7 +48,8 @@ class SparkConfigBuilder(object):
         return dict([parse_value_string(val) for val in values])
 
     @classmethod
-    def initialize(cls, options_from_ini=None):
+    def initialize(cls, options_from_ini=None, spark_connect_url=None):
+
         if cls._instance:
             return cls._instance
 
@@ -37,7 +59,13 @@ class SparkConfigBuilder(object):
 
         cls.options = dict(cls.DEFAULTS)
         if options_from_ini:
-            cls.options.update(cls._parse_config(options_from_ini))
+            opts = cls._parse_config(options_from_ini)
+            cls.options.update(opts)
+        if spark_connect_url or os.environ.get("SPARK_REMOTE"):
+            cls.spark_connect_url = spark_connect_url or os.environ.get("SPARK_REMOTE")
+            for k in cls.SPARK_REMOTE_DISABLED_SETTINGS:
+                if k in cls.options:
+                    del cls.options[k]
 
         for k, v in cls.options.items():
             cls._instance.set(k, v)
@@ -50,3 +78,9 @@ class SparkConfigBuilder(object):
             cls.initialize()
 
         return cls._instance
+
+    @classmethod
+    def is_spark_connect(cls):
+        if not cls._instance:
+            cls.initialize()
+        return bool(cls.spark_connect_url)
